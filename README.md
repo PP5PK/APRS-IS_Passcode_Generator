@@ -8,7 +8,7 @@ Built with a retro terminal aesthetic, no external runtime dependencies, and ful
 
 ## 🌐 Live
 
-> **[aprs.dvbr.net](https://aprs.dvbr.net)**
+> **[aprs.pp5kx.net](https://aprs.pp5kx.net)**
 
 ---
 
@@ -109,6 +109,7 @@ Reference: [www.aprs-is.net](http://www.aprs-is.net)
 
 - Website: [pp5kx.net](https://pp5kx.net)
 - WhatsApp: [Contact](https://api.whatsapp.com/send?phone=5541991912000)
+- Telegram: [Contact](https://t.me/PP5KX)
 
 ---
 
