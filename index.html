@@ -1,5 +1,5 @@
 <!DOCTYPE html>
-<html lang="en">
+<html lang="en" id="html-root">
 <head>
   <meta charset="UTF-8" />
   <title>APRS Passcode Generator</title>
@@ -437,6 +437,59 @@
 
     .result-value.pop { animation: pop 0.3s ease; }
 
+    /* ── Language toggle ── */
+    .lang-toggle {
+      position: fixed;
+      top: 16px;
+      right: 20px;
+      z-index: 10;
+      display: flex;
+      align-items: center;
+      gap: 0;
+      background: var(--bg-card);
+      border: 1px solid var(--border);
+      border-radius: 3px;
+      overflow: hidden;
+      box-shadow: 0 2px 12px rgba(0,0,0,0.4);
+      animation: fadeDown 0.6s ease both 0.2s;
+    }
+
+    .lang-btn {
+      background: none;
+      border: none;
+      cursor: pointer;
+      font-family: var(--font-mono);
+      font-size: 11px;
+      letter-spacing: 0.14em;
+      padding: 7px 10px;
+      color: var(--text-dim);
+      transition: color 0.2s, background 0.2s;
+      line-height: 1;
+    }
+
+    .lang-btn:hover { color: var(--text-muted); }
+
+    .lang-btn.active {
+      color: var(--accent);
+      background: rgba(0,229,160,0.07);
+    }
+
+    .lang-sep {
+      width: 1px;
+      height: 16px;
+      background: var(--border);
+      flex-shrink: 0;
+    }
+
+    .lang-globe {
+      font-size: 13px;
+      padding: 7px 8px 7px 10px;
+      color: var(--text-dim);
+      line-height: 1;
+      pointer-events: none;
+      user-select: none;
+    }
+
     /* ── Responsive ── */
     @media (max-width: 560px) {
       .card { padding: 28px 24px 24px; }
@@ -447,9 +500,17 @@
 </head>
 <body>
 
+  <!-- Language toggle -->
+  <div class="lang-toggle" role="group" aria-label="Language selector">
+    <span class="lang-globe" aria-hidden="true">🌐</span>
+    <button class="lang-btn" id="btn-pt" onclick="setLang('pt')" aria-label="Português">PT</button>
+    <div class="lang-sep"></div>
+    <button class="lang-btn" id="btn-en" onclick="setLang('en')" aria-label="English">EN</button>
+  </div>
+
   <div class="header-bar">
     <div class="signal-dot"></div>
-    <div class="header-label">APRS-IS // <span>PASSCODE GENERATOR</span> // v2.0</div>
+    <div id="header-label" class="header-label">APRS-IS // <span>PASSCODE GENERATOR</span> // v2.0</div>
   </div>
 
   <div id="app" class="card">
@@ -457,15 +518,15 @@
     <div class="title-row">
       <div class="title-icon">📡</div>
       <div class="title-text">
-        <h1>APRS Passcode Generator</h1>
-        <p>Enter your station callsign to obtain your APRS-IS network access passcode.</p>
+        <h1 id="app-h1">APRS Passcode Generator</h1>
+        <p id="app-subtitle">Enter your station callsign to obtain your APRS-IS network access passcode.</p>
       </div>
     </div>
 
     <div class="divider"></div>
 
     <div class="field-label">
-      <span>Station Callsign</span>
+      <span id="field-label-text">Station Callsign</span>
       <span id="char-counter" class="char-counter">0 / 8</span>
     </div>
 
@@ -500,11 +561,107 @@
   </div>
 
   <div class="footer">
-    Provided by Daniel K. &mdash; PP5KX &nbsp;|&nbsp;
+    <span id="footer-text">Provided by Daniel K. &mdash; PP5KX</span> &nbsp;|&nbsp;
     <a href="https://pp5kx.net" title="pp5kx.net" target="_blank" rel="noopener">pp5kx.net</a>
   </div>
 
   <script>
+
+    /* ════════════════════════════════════════════════
+       i18n — all UI strings in both languages
+    ════════════════════════════════════════════════ */
+    var STRINGS = {
+      pt: {
+        pageTitle:      'Gerador de Senhas APRS',
+        metaDesc:       'Ferramenta para gerar senhas para a rede APRS-IS baseada no indicativo da estação.',
+        headerLabel:    'APRS-IS // <span>GERADOR DE SENHAS</span> // v2.0',
+        h1:             'Gerador de Senhas APRS',
+        subtitle:       'Insira o indicativo da estação para obter a senha de acesso à rede APRS-IS.',
+        fieldLabel:     'Indicativo da Estação',
+        placeholder:    'Ex: PP5KX',
+        clearTitle:     'Limpar',
+        copyTitle:      'Copiar senha',
+        copyBtn:        '⎘ Copiar',
+        copiedBtn:      '✓ Copiado!',
+        statusWaiting:  'Calculando',
+        statusDone:     'Senha calculada',
+        footerText:     'Oferecido por Daniel K. &mdash; PP5KX',
+        footerLink:     'pp5kx.net',
+        langHtml:       'pt-BR',
+      },
+      en: {
+        pageTitle:      'APRS Passcode Generator',
+        metaDesc:       'Tool to generate APRS-IS passcodes based on your station callsign.',
+        headerLabel:    'APRS-IS // <span>PASSCODE GENERATOR</span> // v2.0',
+        h1:             'APRS Passcode Generator',
+        subtitle:       'Enter your station callsign to obtain your APRS-IS network access passcode.',
+        fieldLabel:     'Station Callsign',
+        placeholder:    'e.g. PP5KX',
+        clearTitle:     'Clear',
+        copyTitle:      'Copy passcode',
+        copyBtn:        '⎘ Copy',
+        copiedBtn:      '✓ Copied!',
+        statusWaiting:  'Calculating',
+        statusDone:     'Passcode calculated',
+        footerText:     'Provided by Daniel K. &mdash; PP5KX',
+        footerLink:     'pp5kx.net',
+        langHtml:       'en',
+      }
+    };
+
+    /* ── Detect browser language; default to EN for anything other than PT ── */
+    function detectLang() {
+      var saved = localStorage.getItem('aprs-lang');
+      if (saved === 'pt' || saved === 'en') return saved;
+      var nav = (navigator.language || navigator.userLanguage || 'en').toLowerCase();
+      return nav.startsWith('pt') ? 'pt' : 'en';
+    }
+
+    /* ── Apply language strings to the DOM ── */
+    var currentLang = 'en';
+
+    function applyLang(lang) {
+      currentLang = lang;
+      var s = STRINGS[lang];
+
+      document.getElementById('html-root').lang   = s.langHtml;
+      document.title                               = s.pageTitle;
+      document.querySelector('meta[name="description"]').content = s.metaDesc;
+
+      document.getElementById('header-label').innerHTML  = s.headerLabel;
+      document.getElementById('app-h1').textContent       = s.h1;
+      document.getElementById('app-subtitle').textContent = s.subtitle;
+      document.getElementById('field-label-text').textContent = s.fieldLabel;
+      document.getElementById('callsign').placeholder    = s.placeholder;
+      document.getElementById('btn-clear').title         = s.clearTitle;
+      document.getElementById('btn-copy').title          = s.copyTitle;
+      document.getElementById('footer-text').innerHTML   = s.footerText;
+
+      /* Update copy button label only if not in "copied" state */
+      var elCopy = document.getElementById('btn-copy');
+      if (elCopy.dataset.copied !== 'true') elCopy.textContent = s.copyBtn;
+
+      /* Update status label if currently shown */
+      var elStatus = document.getElementById('calc-status');
+      if (elStatus.classList.contains('waiting')) {
+        elStatus.innerHTML = '<span class="dots"><span>●</span><span>●</span><span>●</span></span> <span>' + s.statusWaiting + '</span>';
+      } else if (elStatus.classList.contains('done')) {
+        elStatus.innerHTML = '<span>✓</span> <span>' + s.statusDone + '</span>';
+      }
+
+      /* Toggle button active state */
+      document.getElementById('btn-pt').classList.toggle('active', lang === 'pt');
+      document.getElementById('btn-en').classList.toggle('active', lang === 'en');
+
+      localStorage.setItem('aprs-lang', lang);
+    }
+
+    /* Exposed globally so onclick= works */
+    function setLang(lang) { applyLang(lang); }
+
+    /* ════════════════════════════════════════════════
+       App logic
+    ════════════════════════════════════════════════ */
     document.addEventListener('DOMContentLoaded', function () {
 
       var debounceTimer   = null;
@@ -520,6 +677,9 @@
       var elResult  = document.getElementById('result-value');
       var elCopy    = document.getElementById('btn-copy');
 
+      /* Apply detected language on load */
+      applyLang(detectLang());
+
       /* ── Passcode calculation (standard APRS-IS XOR algorithm) ── */
       function calcPasscode(callsign) {
         var i = 0, code = 29666;
@@ -533,6 +693,7 @@
 
       /* ── Display result and auto-copy to clipboard ── */
       function showPasscode(value) {
+        var s = STRINGS[currentLang];
         currentPasscode = value;
         elResult.textContent = value;
         elResult.classList.add('active');
@@ -545,8 +706,12 @@
         setTimeout(function () { elResult.classList.remove('pop'); }, 350);
         // auto-copy
         copyToClipboard(String(value), function () {
-          elCopy.textContent = '✓ Copied!';
-          setTimeout(function () { elCopy.textContent = '⎘ Copy'; }, 2000);
+          elCopy.dataset.copied = 'true';
+          elCopy.textContent = s.copiedBtn;
+          setTimeout(function () {
+            elCopy.dataset.copied = 'false';
+            elCopy.textContent = STRINGS[currentLang].copyBtn;
+          }, 2000);
         });
       }
 
@@ -556,8 +721,9 @@
         elResult.textContent = '——';
         elResult.classList.remove('active', 'pop');
         elBox.classList.remove('has-result');
-        elCopy.style.display  = 'none';
-        elCopy.textContent    = '⎘ Copy';
+        elCopy.style.display      = 'none';
+        elCopy.textContent        = STRINGS[currentLang].copyBtn;
+        elCopy.dataset.copied     = 'false';
       }
 
       /* ── Update character counter ── */
@@ -570,13 +736,14 @@
 
       /* ── Debounce status indicator ── */
       function setStatus(state) {
+        var s = STRINGS[currentLang];
         elStatus.className = 'calc-status';
         if (state === 'waiting') {
           elStatus.classList.add('waiting');
-          elStatus.innerHTML = '<span class="dots"><span>●</span><span>●</span><span>●</span></span> <span>Calculating</span>';
+          elStatus.innerHTML = '<span class="dots"><span>●</span><span>●</span><span>●</span></span> <span>' + s.statusWaiting + '</span>';
         } else if (state === 'done') {
           elStatus.classList.add('done');
-          elStatus.innerHTML = '<span>✓</span> <span>Passcode calculated</span>';
+          elStatus.innerHTML = '<span>✓</span> <span>' + s.statusDone + '</span>';
         } else {
           elStatus.innerHTML = '';
         }
@@ -667,9 +834,14 @@
       elCopy.addEventListener('click', function (e) {
         e.stopPropagation();
         if (currentPasscode === null) return;
+        var s = STRINGS[currentLang];
         copyToClipboard(String(currentPasscode), function () {
-          elCopy.textContent = '✓ Copied!';
-          setTimeout(function () { elCopy.textContent = '⎘ Copy'; }, 2000);
+          elCopy.dataset.copied = 'true';
+          elCopy.textContent = s.copiedBtn;
+          setTimeout(function () {
+            elCopy.dataset.copied = 'false';
+            elCopy.textContent = STRINGS[currentLang].copyBtn;
+          }, 2000);
         });
       });
 
