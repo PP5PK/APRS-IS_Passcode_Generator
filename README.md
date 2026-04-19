@@ -8,7 +8,7 @@ Built with a retro terminal aesthetic, no external runtime dependencies, and ful
 
 ## 🌐 Live
 
-> **[aprs.pp5kx.net](https://aprs.pp5kx.net)**
+> **[aprs.dvbr.net](https://aprs.dvbr.net)**
 
 ---
 
@@ -23,6 +23,7 @@ Built with a retro terminal aesthetic, no external runtime dependencies, and ful
 - **Calculation status indicator** — animated "waiting" state (amber) and "done" confirmation (green)
 - **Clear button** — appears dynamically while typing; resets all state with one click
 - **Responsive layout** — adapted for both mobile and desktop screens
+- **Bilingual UI (EN / PT)** — automatic language detection with a manual toggle; preference is saved across visits
 
 ---
 
@@ -43,6 +44,20 @@ function calcPasscode(callsign) {
 ```
 
 The result is an integer between 0 and 32767, uniquely tied to the provided callsign.
+
+---
+
+## 🌍 Internationalization (i18n)
+
+The page is available in **English** and **Portuguese (pt-BR)** within a single HTML file.
+
+**Automatic detection** — on load, the script reads `navigator.language`. Any `pt-*` variant (pt-BR, pt-PT, etc.) renders the page in Portuguese; any other language falls back to English.
+
+**Manual toggle** — a `🌐 PT | EN` button fixed in the top-right corner lets the user switch at any time. The active language is highlighted in green.
+
+**Persistent preference** — the manual choice is saved to `localStorage` under the key `aprs-lang` and takes precedence over browser detection on subsequent visits.
+
+**Translated elements** — every visible string switches with the language, including: page title, meta description, `<html lang>`, header label, card title and subtitle, field label, input placeholder, button labels, debounce status messages, and footer attribution.
 
 ---
 
@@ -90,6 +105,8 @@ server {
 |---|---|
 | Clipboard API (`navigator.clipboard`) | Modern browsers (HTTPS required) |
 | `execCommand` fallback | Legacy browsers / HTTP |
+| Language detection (`navigator.language`) | All modern browsers |
+| `localStorage` preference | All modern browsers |
 | Responsive layout | Mobile and desktop |
 | JavaScript required | Yes (client-side calculation) |
 
@@ -109,7 +126,6 @@ Reference: [www.aprs-is.net](http://www.aprs-is.net)
 
 - Website: [pp5kx.net](https://pp5kx.net)
 - WhatsApp: [Contact](https://api.whatsapp.com/send?phone=5541991912000)
-- Telegram: [Contact](https://t.me/PP5KX)
 
 ---
 
