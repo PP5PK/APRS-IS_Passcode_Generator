@@ -126,6 +126,7 @@ Reference: [www.aprs-is.net](http://www.aprs-is.net)
 
 - Website: [pp5kx.net](https://pp5kx.net)
 - WhatsApp: [Contact](https://api.whatsapp.com/send?phone=5541991912000)
+- Telegram: [Contact](https://t.me/PP5KX)
 
 ---
 
