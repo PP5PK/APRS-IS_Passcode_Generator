@@ -1,10 +1,13 @@
 <!DOCTYPE html>
-<html lang="pt-BR">
+<html lang="en">
 <head>
   <meta charset="UTF-8" />
-  <title>Gerador de Senhas APRS</title>
-  <meta name="description" content="Ferramenta para gerar senhas para a rede APRS-IS baseada no indicativo da estação." />
+  <title>APRS Passcode Generator</title>
+  <meta name="description" content="Tool to generate APRS-IS passcodes based on your station callsign." />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+
+  <!-- Favicon -->
+  <link rel="icon" type="image/svg+xml" href="favicon.svg" />
 
   <link rel="preconnect" href="https://fonts.googleapis.com" />
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
@@ -111,9 +114,7 @@
       text-transform: uppercase;
     }
 
-    .header-label span {
-      color: var(--accent);
-    }
+    .header-label span { color: var(--accent); }
 
     /* ── Main card ── */
     .card {
@@ -456,15 +457,15 @@
     <div class="title-row">
       <div class="title-icon">📡</div>
       <div class="title-text">
-        <h1>Gerador de Senhas APRS</h1>
-        <p>Insira o indicativo da estação para obter a senha de acesso à rede APRS-IS.</p>
+        <h1>APRS Passcode Generator</h1>
+        <p>Enter your station callsign to obtain your APRS-IS network access passcode.</p>
       </div>
     </div>
 
     <div class="divider"></div>
 
     <div class="field-label">
-      <span>Indicativo da Estação</span>
+      <span>Station Callsign</span>
       <span id="char-counter" class="char-counter">0 / 8</span>
     </div>
 
@@ -477,9 +478,9 @@
         autocorrect="off"
         autocapitalize="characters"
         spellcheck="false"
-        placeholder="Ex: PY2ABC"
+        placeholder="e.g. PP5KX"
       />
-      <button type="button" id="btn-clear" class="input-clear" title="Limpar">✕</button>
+      <button type="button" id="btn-clear" class="input-clear" title="Clear">✕</button>
     </div>
 
     <div id="error-msg" class="error-msg">
@@ -491,22 +492,22 @@
     <div id="result-box" class="result-box">
       <span class="result-label">Passcode</span>
       <span id="result-value" class="result-value">——</span>
-      <button type="button" id="btn-copy" class="copy-btn" style="display:none" title="Copiar senha">
-        ⎘ Copiar
+      <button type="button" id="btn-copy" class="copy-btn" style="display:none" title="Copy passcode">
+        ⎘ Copy
       </button>
     </div>
 
   </div>
 
   <div class="footer">
-    Oferecido por Daniel K. &mdash; PU5KOD &nbsp;|&nbsp;
-    <a href="https://api.whatsapp.com/send?phone=5541991912000" title="WhatsApp" target="_blank" rel="noopener">Contato</a>
+    Provided by Daniel K. &mdash; PP5KX &nbsp;|&nbsp;
+    <a href="https://pp5kx.net" title="pp5kx.net" target="_blank" rel="noopener">pp5kx.net</a>
   </div>
 
   <script>
     document.addEventListener('DOMContentLoaded', function () {
 
-      var debounceTimer  = null;
+      var debounceTimer   = null;
       var currentPasscode = null;
 
       var elInput   = document.getElementById('callsign');
@@ -519,7 +520,7 @@
       var elResult  = document.getElementById('result-value');
       var elCopy    = document.getElementById('btn-copy');
 
-      /* ── Cálculo do passcode ── */
+      /* ── Passcode calculation (standard APRS-IS XOR algorithm) ── */
       function calcPasscode(callsign) {
         var i = 0, code = 29666;
         while (i < callsign.length) {
@@ -530,36 +531,36 @@
         return code & 32767;
       }
 
-      /* ── Exibe o resultado e copia automaticamente ── */
+      /* ── Display result and auto-copy to clipboard ── */
       function showPasscode(value) {
         currentPasscode = value;
         elResult.textContent = value;
         elResult.classList.add('active');
         elBox.classList.add('has-result');
         elCopy.style.display = 'inline-flex';
-        // animação pop
+        // pop animation
         elResult.classList.remove('pop');
-        void elResult.offsetWidth; // força reflow
+        void elResult.offsetWidth; // force reflow
         elResult.classList.add('pop');
         setTimeout(function () { elResult.classList.remove('pop'); }, 350);
-        // cópia automática
+        // auto-copy
         copyToClipboard(String(value), function () {
-          elCopy.textContent = '✓ Copiado!';
-          setTimeout(function () { elCopy.textContent = '⎘ Copiar'; }, 2000);
+          elCopy.textContent = '✓ Copied!';
+          setTimeout(function () { elCopy.textContent = '⎘ Copy'; }, 2000);
         });
       }
 
-      /* ── Limpa o resultado ── */
+      /* ── Clear result state ── */
       function clearPasscode() {
         currentPasscode = null;
         elResult.textContent = '——';
         elResult.classList.remove('active', 'pop');
         elBox.classList.remove('has-result');
         elCopy.style.display  = 'none';
-        elCopy.textContent    = '⎘ Copiar';
+        elCopy.textContent    = '⎘ Copy';
       }
 
-      /* ── Atualiza contador de caracteres ── */
+      /* ── Update character counter ── */
       function updateCounter(len) {
         elCounter.textContent = len + ' / 8';
         elCounter.className   = 'char-counter';
@@ -567,21 +568,21 @@
         else if (len >= 3) elCounter.classList.add('active');
       }
 
-      /* ── Status de debounce ── */
+      /* ── Debounce status indicator ── */
       function setStatus(state) {
         elStatus.className = 'calc-status';
         if (state === 'waiting') {
           elStatus.classList.add('waiting');
-          elStatus.innerHTML = '<span class="dots"><span>●</span><span>●</span><span>●</span></span> <span>Calculando</span>';
+          elStatus.innerHTML = '<span class="dots"><span>●</span><span>●</span><span>●</span></span> <span>Calculating</span>';
         } else if (state === 'done') {
           elStatus.classList.add('done');
-          elStatus.innerHTML = '<span>✓</span> <span>Passcode calculado</span>';
+          elStatus.innerHTML = '<span>✓</span> <span>Passcode calculated</span>';
         } else {
           elStatus.innerHTML = '';
         }
       }
 
-      /* ── Evento de digitação ── */
+      /* ── Input event: sanitize, debounce and trigger calculation ── */
       elInput.addEventListener('input', function () {
         var clean = elInput.value.toUpperCase().replace(/[^A-Z0-9]/g, '');
         if (elInput.value !== clean) {
@@ -607,7 +608,7 @@
         }
       });
 
-      /* ── Enter: cálculo imediato ── */
+      /* ── Enter key: immediate calculation, bypasses debounce ── */
       elInput.addEventListener('keydown', function (e) {
         if (e.key !== 'Enter') return;
         clearTimeout(debounceTimer);
@@ -618,7 +619,7 @@
         }
       });
 
-      /* ── Botão limpar ── */
+      /* ── Clear button ── */
       elClear.addEventListener('click', function () {
         clearTimeout(debounceTimer);
         elInput.value = '';
@@ -631,7 +632,7 @@
         elInput.focus();
       });
 
-      /* ── Função de cópia compartilhada ── */
+      /* ── Shared clipboard helper: modern API with legacy execCommand fallback ── */
       function copyToClipboard(text, callback) {
         if (navigator.clipboard && window.isSecureContext) {
           navigator.clipboard.writeText(text).then(callback).catch(function () {
@@ -662,13 +663,13 @@
         if (ok) callback();
       }
 
-      /* ── Botão copiar (cópia manual) ── */
+      /* ── Copy button (manual copy) ── */
       elCopy.addEventListener('click', function (e) {
         e.stopPropagation();
         if (currentPasscode === null) return;
         copyToClipboard(String(currentPasscode), function () {
-          elCopy.textContent = '✓ Copiado!';
-          setTimeout(function () { elCopy.textContent = '⎘ Copiar'; }, 2000);
+          elCopy.textContent = '✓ Copied!';
+          setTimeout(function () { elCopy.textContent = '⎘ Copy'; }, 2000);
         });
       });
 

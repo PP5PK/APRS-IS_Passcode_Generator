@@ -1,34 +1,34 @@
-# 📡 Gerador de Senhas APRS-IS
+# 📡 APRS Passcode Generator
 
-Ferramenta web para geração de passcodes de acesso à rede **APRS-IS** (*Automatic Packet Reporting System – Internet Service*), baseada no indicativo de chamada da estação.
+A web tool for generating **APRS-IS** (*Automatic Packet Reporting System – Internet Service*) passcodes from an amateur radio station callsign.
 
-Desenvolvida com estética de terminal retrô, sem dependências externas e totalmente client-side — o cálculo é feito diretamente no navegador, sem envio de dados a servidores.
+Built with a retro terminal aesthetic, no external runtime dependencies, and fully client-side — the calculation runs entirely in the browser, no data is ever sent to a server.
 
 ---
 
-## 🌐 Acesso
+## 🌐 Live
 
 > **[aprs.dvbr.net](https://aprs.dvbr.net)**
 
 ---
 
-## ✨ Funcionalidades
+## ✨ Features
 
-- **Cálculo automático com debounce** — o passcode é gerado automaticamente 2 segundos após a digitação parar (mínimo de 3 caracteres)
-- **Cálculo imediato via Enter** — pressionar `Enter` dispara o cálculo sem esperar o debounce
-- **Cópia automática para a área de transferência** — ao calcular, o passcode é copiado automaticamente
-- **Botão de cópia manual** — permite copiar novamente a qualquer momento
-- **Validação e sanitização em tempo real** — apenas caracteres alfanuméricos são aceitos; a entrada é convertida automaticamente para maiúsculas
-- **Contador de caracteres** — com indicação visual de aviso ao se aproximar do limite de 8 caracteres
-- **Indicador de status de cálculo** — animação de "aguardando" (âmbar) e confirmação de "calculado" (verde)
-- **Botão de limpar** — aparece dinamicamente ao digitar e reseta todos os estados
-- **Layout responsivo** — adaptado para telas móveis e desktops
+- **Auto-calculation with debounce** — passcode is generated automatically 2 seconds after typing stops (minimum 3 characters)
+- **Instant calculation via Enter** — pressing `Enter` triggers the calculation immediately, bypassing the debounce delay
+- **Auto-copy to clipboard** — as soon as the passcode is calculated, it is copied automatically
+- **Manual copy button** — allows copying again at any time after the initial calculation
+- **Real-time input sanitization** — only alphanumeric characters are accepted; input is forced to uppercase on the fly
+- **Character counter** — with visual warning color as the 8-character limit approaches
+- **Calculation status indicator** — animated "waiting" state (amber) and "done" confirmation (green)
+- **Clear button** — appears dynamically while typing; resets all state with one click
+- **Responsive layout** — adapted for both mobile and desktop screens
 
 ---
 
-## 🔐 Algoritmo
+## 🔐 Algorithm
 
-O passcode é calculado pelo algoritmo padrão utilizado pela rede APRS-IS, derivado do indicativo da estação em maiúsculas:
+The passcode is computed using the standard APRS-IS algorithm, derived from the uppercased station callsign:
 
 ```javascript
 function calcPasscode(callsign) {
@@ -42,35 +42,36 @@ function calcPasscode(callsign) {
 }
 ```
 
-O resultado é um número inteiro de 0 a 32767 vinculado ao indicativo informado.
+The result is an integer between 0 and 32767, uniquely tied to the provided callsign.
 
 ---
 
 ## 🎨 Design
 
-- **Tema:** terminal retrô escuro com scanlines e glow verde/âmbar
-- **Paleta:** fundo `#080c0e`, acento `#00e5a0` (verde), destaque `#ffb347` (âmbar)
-- **Tipografia:** [Orbitron](https://fonts.google.com/specimen/Orbitron) (títulos e valores) + [Share Tech Mono](https://fonts.google.com/specimen/Share+Tech+Mono) (interface)
-- **Acessibilidade:** contraste alto, sem dependência de distinção vermelho/verde para informações críticas
+- **Theme:** dark retro terminal with scanline overlay and green/amber glow
+- **Color palette:** background `#080c0e`, accent `#00e5a0` (green), highlight `#ffb347` (amber)
+- **Typography:** [Orbitron](https://fonts.google.com/specimen/Orbitron) (headings and values) + [Share Tech Mono](https://fonts.google.com/specimen/Share+Tech+Mono) (interface text)
+- **Accessibility:** high contrast, no reliance on red/green distinction for critical information
 
 ---
 
-## 🏗️ Estrutura do Projeto
+## 🏗️ Project Structure
 
 ```
 .
-└── index.html   # Aplicação completa — HTML, CSS e JavaScript em arquivo único
+├── index.html    # Complete application — HTML, CSS and JavaScript in a single file
+└── favicon.svg   # Retro terminal antenna icon for browser tab
 ```
 
-Sem frameworks, sem build step, sem dependências de runtime. Basta abrir o arquivo em qualquer navegador moderno.
+No frameworks, no build step, no runtime dependencies. Just open `index.html` in any modern browser.
 
 ---
 
-## 🚀 Deploy
+## 🚀 Deployment
 
-O projeto pode ser hospedado em qualquer serviço de hospedagem estática (Cloudflare Pages, GitHub Pages, Nginx, Apache etc.).
+The project can be hosted on any static hosting service (Cloudflare Pages, GitHub Pages, Nginx, Apache, etc.).
 
-Exemplo com Nginx:
+Example Nginx configuration:
 
 ```nginx
 server {
@@ -83,35 +84,35 @@ server {
 
 ---
 
-## 🔧 Compatibilidade
+## 🔧 Browser Compatibility
 
-| Recurso | Suporte |
+| Feature | Support |
 |---|---|
-| Clipboard API (`navigator.clipboard`) | Navegadores modernos (HTTPS) |
-| Fallback `execCommand` | Navegadores legados / HTTP |
-| Layout responsivo | Mobile e desktop |
-| JavaScript necessário | Sim (cálculo client-side) |
+| Clipboard API (`navigator.clipboard`) | Modern browsers (HTTPS required) |
+| `execCommand` fallback | Legacy browsers / HTTP |
+| Responsive layout | Mobile and desktop |
+| JavaScript required | Yes (client-side calculation) |
 
 ---
 
-## 📻 Sobre o APRS-IS
+## 📻 About APRS-IS
 
-O **APRS-IS** é a infraestrutura de internet que interliga os gateways APRS ao redor do mundo, permitindo o rastreamento e troca de dados entre estações de radioamador. Para se conectar a um servidor APRS-IS com um software cliente (como Xastir, YAAC, Direwolf etc.), é necessário um passcode derivado do próprio indicativo da estação.
+**APRS-IS** is the internet backbone that connects APRS gateways around the world, enabling tracking and data exchange between amateur radio stations. To connect a client application (such as Xastir, YAAC, Direwolf, etc.) to an APRS-IS server, a passcode derived from the station callsign is required.
 
-Referência: [www.aprs-is.net](http://www.aprs-is.net)
-
----
-
-## 👤 Autor
-
-**Daniel K. — PU5KOD**
-
-- Site: [dvbr.net](https://dvbr.net)
-- WhatsApp: [Contato](https://api.whatsapp.com/send?phone=5541991912000)
+Reference: [www.aprs-is.net](http://www.aprs-is.net)
 
 ---
 
-## 📄 Licença
+## 👤 Author
 
-Este projeto é disponibilizado para uso livre pela comunidade de radioamadores.
-Sinta-se à vontade para adaptar e redistribuir, mantendo a atribuição ao autor original.
+**Daniel K. — PP5KX**
+
+- Website: [pp5kx.net](https://pp5kx.net)
+- WhatsApp: [Contact](https://api.whatsapp.com/send?phone=5541991912000)
+
+---
+
+## 📄 License
+
+This project is freely available for use by the amateur radio community.
+Feel free to adapt and redistribute it, keeping attribution to the original author.
