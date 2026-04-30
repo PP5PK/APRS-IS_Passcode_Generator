@@ -9,6 +9,9 @@ Built with a retro terminal aesthetic, no external runtime dependencies, and ful
 ## 🌐 Live
 
 > **[aprs.dvbr.net](https://aprs.dvbr.net)**
+> 
+[![Preview do site](https://cloud.dvbr.net/images/Screenshott_APRS.png)
+](https://aprs.dvbr.net)
 
 ---
 
