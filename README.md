@@ -124,7 +124,7 @@ Reference: [www.aprs-is.net](http://www.aprs-is.net)
 
 **Daniel K. — PP5KX**
 
-- Website: [pp5kx.net](https://pp5kx.net)
+- Website: [pp5pk.net](https://pp5pk.net)
 - WhatsApp: [Contact](https://api.whatsapp.com/send?phone=5541991912000)
 - Telegram: [Contact](https://t.me/PP5KX)
 
