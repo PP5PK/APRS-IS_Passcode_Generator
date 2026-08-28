@@ -132,5 +132,5 @@ Reference: [www.aprs-is.net](http://www.aprs-is.net)
 
 ## 📄 License
 
-This project is freely available for use by the amateur radio community.
-Feel free to adapt and redistribute it, keeping attribution to the original author.
+This project is freely available for use by the amateur radio community, feel free to adapt and redistribute it.
+Released under the **The Unlicense** License. See [`LICENSE`](LICENSE) for details.
